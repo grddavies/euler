@@ -1,0 +1,3 @@
+# Keep only Haskell source files
+*
+!*.hs
