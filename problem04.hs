@@ -1,17 +1,19 @@
 --  A palindromic number reads the same both ways. The largest palindrome made
 --  from the product of two 2-digit numbers is 9009 = 91 × 99.
 --  Find the largest palindrome made from the product of two 3-digit numbers.
-import Data.List ( subsequences, find )
+import Data.List (find, sortBy)
+import Data.Maybe (fromJust)
 
 isPalindromic :: Int -> Bool
 isPalindromic n = n == (read (reverse (show n)) :: Int)
 
-combinations :: Int -> [a] -> [[a]]
-combinations = (. subsequences) . filter . (. length) . (==)
+generateProducts :: Num a => [a] -> [a]
+generateProducts xs = [x * y | x <- xs, y <- xs]
 
-generateProducts :: Num b => [b] -> [b]
-generateProducts = map product . combinations 2
-
+sortDesc :: [Int] -> [Int]
+sortDesc = sortBy (flip compare)
 
 main :: IO ()
-main = print $ find isPalindromic $ generateProducts [999, 998..100]
+main = print . fromJust $ find isPalindromic . sortDesc $ generateProducts threeDigits
+  where
+    threeDigits = [999, 998 .. 100]
