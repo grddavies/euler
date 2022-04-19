@@ -3,7 +3,7 @@
 import Control.Monad (join)
 
 powerSeries :: Integral b => b -> [b]
-powerSeries n = map (join (^)) [1..n]
+powerSeries = map (join (^)) . enumFrom
 
 takeLastN :: Int -> [a] -> [a]
 takeLastN n = reverse . take n . reverse
