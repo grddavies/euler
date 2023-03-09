@@ -4,4 +4,4 @@ fibs :: [Integer]
 fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
 
 main :: IO()
-main = putStr . show $ sum $ filter even $ takeWhile ( < 4000000) fibs
+main = print . sum . filter even $ takeWhile ( < 4000000) fibs
