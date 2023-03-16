@@ -7,9 +7,11 @@ terms :: Integer -> [Integer]
 terms n = [a ^ b | a <- [2..n], b <- [2..n]]
 
 -- Equivalent incomprehensible functor magic
--- We lift (^) and sequentially apply the arguments
+-- We lift (^) and sequentially apply the arguments using instance Applicative List
 termsF :: Integer -> [Integer]
-termsF n = pure (^) <*> [2..n] <*> [2..n]
+termsF n = (^) <$> [2..n] <*> [2..n]
+-- ... which GHC compiles back down into a list comprehension!
+-- https://hackage.haskell.org/package/base-4.18.0.0/docs/src/GHC.Base.html#line-1253
 
 -- Get the number of unique terms in the sequence
 solve :: Integer -> Int
