@@ -7,23 +7,48 @@
 -- How many circular primes are there below one million?
 
 import Primes (primes)
+import qualified Data.Set as Set
 import Data.List (permutations, all)
 
 main :: IO ()
-main = putStrLn . show $ solve 1000000
+main = putStrLn . show $ solveStr 1000000
 
-solve :: Integer -> Int
-solve n = length $ filter isCircularPrime $ takeWhile (< n) primes
+-- String rotation seems faster in ghci
 
-isCircularPrime :: Integer -> Bool
-isCircularPrime x = all (flip member primes) (map read . tail . rotations $ show x)
+solveStr :: Integer -> Int
+solveStr n = Set.size $ Set.filter isCircularPrime $ primesBelowN
+  where
+    primesBelowN = Set.fromList $ takeWhile (< n) primes
+    isCircularPrime x = all (flip Set.member primesBelowN) (map read . tail . rotationsL $ show x)
+
+solveInt n = Set.size $ Set.filter isCircularPrime $ primesBelowN
+  where
+    primesBelowN = Set.fromList $ takeWhile (< n) primes
+    isCircularPrime x = all (flip Set.member primesBelowN) (tail $ rotations x)
+
+-- Count the digits in a positive nonzero number
+digitCount :: Integer -> Integer
+digitCount = go 0 
+  where
+    go ds 0 = ds
+    go ds n = go (ds + 1) (n `div` 10)
+
+-- Rotate the first k digits of a positive integer
+rotateInt :: Integer -> Integer -> Integer
+rotateInt k x = first + rest
+  where
+    first = x `div` n
+    rest = (x `mod` n) * 10 ^ k
+    n = 10 ^ ((digitCount x) - k)
+
+-- All rotations of an integer
+rotations :: Integer -> [Integer]
+rotations x = [rotateInt n x | n <- [0..((digitCount x) - 1)]]
 
 rotate :: Int -> [a] -> [a]
 rotate = drop <> take
 
-rotations :: [a] -> [[a]]
-rotations xs = [rotate n xs | n <- [0..(length xs - 1)]]
-
-member :: Ord a => a -> [a] -> Bool
-member x xs = x `elem` takeWhile (<= x) xs
+-- All rotations of a list
+rotationsL :: [a] -> [[a]]
+rotationsL xs = [rotate n xs | n <- [0..(length xs - 1)]]
 
