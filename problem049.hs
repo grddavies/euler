@@ -11,15 +11,15 @@ import Data.List (permutations, group,  sort, find, intercalate)
 
 import Primes (primes)
 
-solve :: [(Integer, Integer, Integer)]
-solve = dedup . concat . filter (not . null)
+solve :: [(Int, Int, Int)]
+solve = dedup . concat
    $ arithmeticSeq
   <$> filter (`Set.member` fourDigitPrimes)
   <$> dedup . permuteInt
   <$> Set.toList fourDigitPrimes
   where
-    fourDigitPrimes = Set.fromList $ takeWhile (< 10000) $ dropWhile (< 999) primes
-    permuteInt :: Integer -> [Integer]
+    fourDigitPrimes = Set.fromList $ takeWhile (< 10000) $ dropWhile (< 1000) $ map fromInteger primes
+    permuteInt :: Int -> [Int]
     permuteInt = map read . permutations . show
     dedup :: Ord a => [a] -> [a]
     dedup = map head . group . sort
@@ -27,5 +27,7 @@ solve = dedup . concat . filter (not . null)
     arithmeticSeq xs = [(x, y, z) | x <- xs, y <- xs, z <- xs, x /= y, x /= z, y /= z, y - x == z - y, y - x > 0]
 
 main :: IO ()
-main = putStrLn $ maybe "Nothing" (\(x, y, z) -> intercalate "" $ map show [x, y, z]) $ find (/= (1487, 4817, 8147)) solve
+main = putStrLn $ maybe "Nothing" showTuple $ find (/= (1487, 4817, 8147)) solve
+  where 
+    showTuple (x, y, z) = intercalate "" $ map show [x, y, z]
 
