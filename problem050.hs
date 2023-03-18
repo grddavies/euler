@@ -12,7 +12,7 @@ import Data.List (tails, sortBy)
 import Data.Ord (comparing)
 import Data.Function (on)
 
-import Primes (primes)
+import Primes (primesInt)
 
 
 solve n = head . head
@@ -21,10 +21,10 @@ solve n = head . head
           $ fmap reverse
           $ takeWhile (not . null)
           $ takeWhile (< n)
-         <$> map (scanl1 (+)) (tails primes)
+         <$> map (scanl1 (+)) (tails primesInt)
   where
-    primesSet = Set.fromList $ takeWhile (< n) primes
-    isPrime :: Integer -> Bool
+    primesSet = Set.fromList $ takeWhile (< n) primesInt
+    isPrime :: Int -> Bool
     isPrime = (`Set.member` primesSet)
 
 main :: IO ()
