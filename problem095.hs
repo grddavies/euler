@@ -12,46 +12,30 @@
 --
 -- Find the smallest member of the longest amicable chain with no element exceeding one million.
 
-import Data.List (foldl1', group, unfoldr, sortOn, maximumBy)
-import qualified Data.IntSet as Set
+import Data.List (maximumBy)
 import Data.Ord (comparing)
-import Control.Monad (guard)
+import qualified Data.IntSet as Set
 
-import Primes (primesInt)
-
--- Upper bound for chain members
-upper = 999999
-
--- Trial division by primes
-primeFactors n = factors n primesInt
- where
-  factors 1 _                  = []
-  factors m (p:ps) | m < p*p   = [m]
-                   | r == 0    = p : factors q (p:ps)
-                   | otherwise = factors m ps
-   where (q,r) = quotRem m p
-
--- Run length encode primeFactors
-primeFactorsGroup n = map (\xs -> (head xs, length xs)) $ group $ primeFactors n
+import Primes (primeFactorsGroup)
 
 -- (Sorted) List the proper divisors of a number
-divisors n = foldr (\(p, e) ds -> concatMap (\d -> [d*p^ee | ee <- [0..e]]) ds) [1] $ primeFactorsGroup n
+divisors n = foldr (\(p, e) ds -> concatMap (\d -> [d*p^x | x <- [0..e]]) ds) [1] $ primeFactorsGroup n
 
-sumProperDivs d = (sum $ divisors d) - d
+-- Sum the proper divisors of x
+sumpd x = sum (divisors x) - x
 
-amicableChain n = go n n Set.empty
+amicableChainBelow n lim = go n n Set.empty
   where
     go first current visited
       | current `Set.member` visited = if first == current then visited else Set.empty
       | current == 1                 = Set.empty
-      | current > upper              = Set.empty
+      | current > lim                = Set.empty
       | otherwise                    = go first next (Set.insert current visited)
       where
-        next = sumProperDivs current
+        next = sumpd current
 
-chains = map amicableChain [2..upper]
+solve n = Set.findMin . maximumBy (comparing Set.size)
+        $ map (`amicableChainBelow` n) [2..n]
 
-solve = Set.findMin $ maximumBy (comparing Set.size) $ chains
-
-main = putStrLn . show $ solve
+main = print $ solve 999999
 
