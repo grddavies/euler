@@ -6,17 +6,13 @@
 --
 -- What 12-digit number do you form by concatenating the three terms in this sequence?
 
-import qualified Data.Set as Set
-import Data.List (permutations, group,  sort, find, intercalate)
+import qualified Data.IntSet as Set
+import Data.List (permutations, group, sort, find, intercalate)
 
 import Primes (primes)
 
 solve :: [(Int, Int, Int)]
-solve = dedup . concat
-   $ arithmeticSeq
-  <$> filter (`Set.member` fourDigitPrimes)
-  <$> dedup . permuteInt
-  <$> Set.toList fourDigitPrimes
+solve = dedup $ concatMap ((arithmeticSeq <$> filter (`Set.member` fourDigitPrimes)) . dedup . permuteInt) (Set.toList fourDigitPrimes)
   where
     fourDigitPrimes = Set.fromList $ takeWhile (< 10000) $ dropWhile (< 1000) $ map fromInteger primes
     permuteInt :: Int -> [Int]
@@ -24,10 +20,18 @@ solve = dedup . concat
     dedup :: Ord a => [a] -> [a]
     dedup = map head . group . sort
     arithmeticSeq :: (Num c, Ord c) => [c] -> [(c, c, c)]
-    arithmeticSeq xs = [(x, y, z) | x <- xs, y <- xs, z <- xs, x /= y, x /= z, y /= z, y - x == z - y, y - x > 0]
+    arithmeticSeq xs = [(x, y, z) |
+                          x <- xs,
+                          y <- xs,
+                          x /= y,
+                          z <- xs,
+                          x /= z,
+                          y /= z,
+                          y - x == z - y,
+                          y - x > 0]
 
 main :: IO ()
 main = putStrLn $ maybe "Nothing" showTuple $ find (/= (1487, 4817, 8147)) solve
-  where 
+  where
     showTuple (x, y, z) = intercalate "" $ map show [x, y, z]
 
