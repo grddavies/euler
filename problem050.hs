@@ -8,25 +8,24 @@
 -- Which prime, below one-million, can be written as the sum of the most consecutive primes?
 
 import qualified Data.Set as Set
-import Data.List (tails, sortBy)
+import Data.List (tails, minimumBy)
 import Data.Ord (comparing)
 import Data.Function (on)
 
-import Primes (primesInt)
+import Primes (primes)
 
 
-solve n = head . head
-          $ sortBy (flip (compare `on` length))
-          $ fmap (dropWhile (not . isPrime))
-          $ fmap reverse
+solve n = head
+          $ minimumBy (flip compare `on` length)
+          $ fmap (dropWhile (not . isPrime) . reverse)
           $ takeWhile (not . null)
           $ takeWhile (< n)
-         <$> map (scanl1 (+)) (tails primesInt)
+         <$> map (scanl1 (+)) (tails primes)
   where
-    primesSet = Set.fromList $ takeWhile (< n) primesInt
+    primesSet = Set.fromList $ takeWhile (< n) primes
     isPrime :: Int -> Bool
     isPrime = (`Set.member` primesSet)
 
 main :: IO ()
-main = putStrLn . show $ solve 1000000
+main = print $ solve 1000000
 
