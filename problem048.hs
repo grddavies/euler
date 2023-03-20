@@ -3,10 +3,8 @@
 import Control.Monad (join)
 
 powerSeries :: Integral b => b -> [b]
-powerSeries = map (join (^)) . enumFrom
-
-takeLastN :: Int -> [a] -> [a]
-takeLastN n = reverse . take n . reverse
+powerSeries n = map (join (^)) [1..n]
 
 main :: IO ()
-main = putStrLn . takeLastN 10 $ show $ sum $ powerSeries 1000
+main = print $ sum (powerSeries 1000) `mod` (10 ^ 10)
+
