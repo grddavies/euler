@@ -3,16 +3,17 @@ module Primes where
 import qualified Data.Map.Strict as M
 import qualified Data.List as L
 
-primes :: [Integer]
+{-# SPECIALISE primes :: [Int] #-}
+{-# SPECIALISE primes :: [Integer] #-}
+-- Infinite list of primes
+primes :: Integral a => [a]
 primes = sieve [2 ..]
 
-
-primesInt :: [Int]
-primesInt = sieve [2..]
-
-
+{-# SPECIALISE primeFactors :: Int -> [Int] #-}
+{-# SPECIALISE primeFactors :: Integer -> [Integer] #-}
 -- Prime factors by trial division of primes
-primeFactors n = factors n primesInt
+primeFactors :: Integral a => a -> [a]
+primeFactors n = factors n primes
  where
   factors 1 _                  = []
   factors m (p:ps) | m < p*p   = [m]
@@ -20,10 +21,16 @@ primeFactors n = factors n primesInt
                    | otherwise = factors m ps
    where (q,r) = quotRem m p
 
+{-# SPECIALISE primeFactorsGroup :: Int -> [(Int, Int)] #-}
+{-# SPECIALISE primeFactorsGroup :: Integer -> [(Integer, Int)] #-}
 -- List of tuples of prime factors and their exponents
+primeFactorsGroup :: Integral a => a -> [(a, Int)]
 primeFactorsGroup n = map (\xs -> (head xs, length xs)) $ L.group $ primeFactors n
 
+{-# SPECIALISE eulerTotient :: Int -> Int #-}
+{-# SPECIALISE eulerTotient :: Integer -> Integer #-}
 -- Euler totient function
+eulerTotient :: Integral a => a -> a
 eulerTotient n = totient n
   where
     totient 1 = 1
