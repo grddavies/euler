@@ -10,17 +10,16 @@
 --
 -- Evaluate the sum of all the amicable numbers under 10000.
 
-divisors :: Integer -> [Integer]
-divisors n = [ x | x <- [1.. n `div` 2], n `mod` x == 0 ]
+import Primes (primeFactorsGroup)
 
-d :: Integer -> Integer
-d = sum . divisors
+divisors n = product <$> mapM (\(p, k) -> [p^x | x <- [0..k]]) (primeFactorsGroup n)
 
-amicableNumbers :: [Integer]
-amicableNumbers = [ n | n <- [1..],  n == d (d n), n /= d n ]
+d n = sum (divisors n) - n
+
+amicableNumbers = [ n | n <- [2..],  n == d (d n), n /= d n ]
 
 solve n = sum $ takeWhile (< n) amicableNumbers
 
 main :: IO ()
-main = putStrLn . show . sum $ takeWhile (< 10000) amicableNumbers
+main = (print . sum) $ takeWhile (< 10000) amicableNumbers
 

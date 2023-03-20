@@ -27,7 +27,7 @@ primeFactorsGroup n = map (\xs -> (head xs, length xs)) $ L.group $ primeFactors
 eulerTotient n = totient n
   where
     totient 1 = 1
-    totient n = L.foldl1' (*) [p^(k-1) * (p-1) | (p, k) <- primeFactorsGroup n]
+    totient n = product [p^(k-1) * (p-1) | (p, k) <- primeFactorsGroup n]
 
 -- https://doi.org/10.1017/S0956796808007004
 sieve :: Integral a => [a] -> [a]
