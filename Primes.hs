@@ -16,6 +16,7 @@ primeFactors :: Integral a => a -> [a]
 primeFactors n = factors n primes
  where
   factors 1 _                  = []
+  factors m []                 = error "unreachable"
   factors m (p:ps) | m < p*p   = [m]
                    | r == 0    = p : factors q (p:ps)
                    | otherwise = factors m ps
@@ -43,7 +44,7 @@ sieve xs = sieve' xs M.empty
     sieve' [] table = []
     sieve' (x : xs) table = case M.lookup x table of
       Nothing    -> x : sieve' xs (M.insert (x * x) [x] table)
-      Just facts -> sieve' xs (foldl reinsert (M.delete x table) facts)
+      Just facts -> sieve' xs (L.foldl' reinsert (M.delete x table) facts)
       where
         reinsert table prime = M.insertWith (++) (x + prime) [prime] table
 
